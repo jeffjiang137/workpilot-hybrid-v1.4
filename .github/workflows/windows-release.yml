@@ -31,9 +31,11 @@ jobs:
       - name: Build and package
         shell: powershell
         run: |
-          $skip = ''
-          if ('${{ github.event.inputs.skip_installer }}' -eq 'true') { $skip = '-SkipInstaller' }
-          .\scripts\build-installer.ps1 $skip
+          if ('${{ github.event.inputs.skip_installer }}' -eq 'true') {
+            .\scripts\build-installer.ps1 -SkipInstaller
+          } else {
+            .\scripts\build-installer.ps1
+          }
       - uses: actions/upload-artifact@v4
         with:
           name: WorkPilot-Hybrid-win-x64
