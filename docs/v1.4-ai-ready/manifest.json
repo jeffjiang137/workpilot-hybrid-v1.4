@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "packageId": "workpilot-v1.4-ai-ready-spec",
+  "packageVersion": "1.0.0",
+  "productVersion": "1.4.0-1.4.2",
+  "baselineVersion": "1.3",
+  "createdAtUtc": "2026-07-20T00:00:00.000Z",
+  "language": "zh-CN",
+  "targetPlatform": "Windows x64",
+  "targetMcpProtocol": "2025-11-25",
+  "files": [
+    {"path":"00_README_AND_SCOPE.md","sha256":"3016d96a0defd72469a197acce0755de1a78152ddef65edbb4b2bb06431c9183"},
+    {"path":"01_PRD_V1.4.md","sha256":"894ff391e52d38470d9d50d5c134bb434dba8b180e3dccb0d0d2b7983f2bbb37"},
+    {"path":"02_UI_AND_INTERACTION_SPEC.md","sha256":"1751c16e72031ef90d4544e8ac1ce51b0f2cd4ede54ffb93115d05b29b0255b8"},
+    {"path":"03_DOMAIN_AND_DATA_MIGRATIONS.md","sha256":"fae4ea85f6ee5a0af574a77813fc8e854b17e115e6261195d2fc1cadacf631f1"},
+    {"path":"04_EXPERT_AND_SKILL_ALGORITHMS.md","sha256":"071f6eb4c729488cdaa1238403446c23c473618464a36482a9c9d5410dc313c8"},
+    {"path":"05_CONNECTORS_AND_MCP_PROTOCOL.md","sha256":"c9ce9f497d8b5384f342cc20cd33f8770396fab8858b7268c60b9cdcf4642d18"},
+    {"path":"06_SECURITY_AND_PERMISSION_MODEL.md","sha256":"869430ebb46c98f9d62ae055f1129a16e484b02a9b467ef743a8ad6d53801bcf"},
+    {"path":"07_TECH_ARCHITECTURE_AND_APIS.md","sha256":"b8af6e4fdd3c50f310c23d3fbcb8a9251d212ab29f040de136eb3cdbb0b96ada"},
+    {"path":"08_AI_DEVELOPMENT_RULES.md","sha256":"260c0719a92706e9f6fe8099e81e57f9919acf31df99892b5af62b506fb4b955"},
+    {"path":"09_IMPLEMENTATION_PLAN_AND_DOD.md","sha256":"508754e6752d031f18a2278fc9144639aa628418ef205e88b4fd9ce6693d86f9"},
+    {"path":"10_QA_ACCEPTANCE_MATRIX.md","sha256":"8bc9b9617249d59c8ac8e978117d88a22a5e33e8c1b70297903723ed620ac3c3"},
+    {"path":"11_TRACEABILITY_AND_DECISIONS.md","sha256":"b8923302631b860ecd1b2bb3554a0422c3b74d8340bee5f49e90890e0a1fb71d"},
+    {"path":"12_AGENT_KICKOFF_PROMPTS.md","sha256":"1142a4a5cd0529bba97b9734cb738a13dfd0a214e9be5b37f4d82c0680b8b376"},
+    {"path":"13_SPEC_VALIDATION_REPORT.md","sha256":"b92323cf73f81877c0088a7871a7abcec43e8acd7cc50c37c22818f7def79b55"}
+  ]
+}

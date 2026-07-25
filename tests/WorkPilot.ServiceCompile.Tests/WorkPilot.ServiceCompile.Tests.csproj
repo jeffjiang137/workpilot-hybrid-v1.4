@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <DefaultCompileItems>false</DefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src\WorkPilot.App\Models\*.cs" Link="Models\%(Filename)%(Extension)" />
+    <Compile Include="..\..\src\WorkPilot.App\Services\*.cs"
+             Exclude="..\..\src\WorkPilot.App\Services\DispatcherQueueExtensions.cs"
+             Link="Services\%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>

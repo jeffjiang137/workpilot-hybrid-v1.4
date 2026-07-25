@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+    <RootNamespace>WorkPilot</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PublishSingleFile>false</PublishSingleFile>
+    <InvariantGlobalization>false</InvariantGlobalization>
+    <Version>1.4.0</Version>
+    <FileVersion>1.4.0.0</FileVersion>
+    <AssemblyVersion>1.4.0.0</AssemblyVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.4948" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.4" />
+  </ItemGroup>
+  <!-- V1.5 automation editor (T06): the editor view-model logic lives in WorkPilot.App.Core, a
+       net8.0 BCL library shared with the (testable) App.Core.Tests. The WinUI App binds to it.
+       Compile of this WinUI project is gated to a real Windows build (doc 10 §16). -->
+  <ItemGroup>
+    <ProjectReference Include="..\WorkPilot.App.Core\WorkPilot.App.Core.csproj" />
+    <ProjectReference Include="..\WorkPilot.Contracts\WorkPilot.Contracts.csproj" />
+    <ProjectReference Include="..\WorkPilot.Domain\WorkPilot.Domain.csproj" />
+    <ProjectReference Include="..\WorkPilot.Application\WorkPilot.Application.csproj" />
+    <!-- T18 permission page (PER-003/004/008–010): the WinUI App is the composition root and wires the
+         SQLite policy/grant store + Application policy services into the BCL view-model. -->
+    <ProjectReference Include="..\WorkPilot.Infrastructure\WorkPilot.Infrastructure.csproj" />
+  </ItemGroup>
+  <PropertyGroup>
+    <NativeCorePath>$(MSBuildThisFileDirectory)..\..\artifacts\native\$(Configuration)\x64\workpilot_core.dll</NativeCorePath>
+  </PropertyGroup>
+  <Target Name="CopyNativeCoreAfterBuild" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
+    <Error Condition="!Exists('$(NativeCorePath)')" Text="Native core missing. Build WorkPilot.Core.Native first." />
+    <Copy SourceFiles="$(NativeCorePath)" DestinationFolder="$(OutDir)" />
+  </Target>
+  <Target Name="CopyNativeCoreAfterPublish" AfterTargets="Publish">
+    <Copy SourceFiles="$(NativeCorePath)" DestinationFolder="$(PublishDir)" />
+  </Target>
+</Project>

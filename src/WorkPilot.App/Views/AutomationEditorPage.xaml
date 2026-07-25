@@ -1,0 +1,210 @@
+<Page
+    x:Class="WorkPilot.Views.AutomationEditorPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WorkPilot.Views"
+    xmlns:automation="using:Microsoft.UI.Xaml.Automation"
+    Background="{StaticResource AppBackgroundBrush}">
+
+  <Page.Resources>
+    <local:DateTimeOffsetToStringConverter x:Key="DateTimeOffsetToString" />
+    <local:BoolToSkippedConverter x:Key="BoolToSkipped" />
+    <local:BoolToDisabledConverter x:Key="BoolToDisabled" />
+    <local:NullableLongToDoubleConverter x:Key="LongToDouble" />
+  </Page.Resources>
+
+  <!-- Editor-wide keyboard shortcuts (doc 02 §4): Ctrl+S = save draft, Esc = attempt close. -->
+  <Page.KeyboardAccelerators>
+    <KeyboardAccelerator Key="S" Modifiers="Control" Invoked="OnSaveAccelerator" />
+    <KeyboardAccelerator Key="Escape" Invoked="OnEscapeAccelerator" />
+  </Page.KeyboardAccelerators>
+
+  <Grid x:Name="Root" RowSpacing="0">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Title bar: name, dirty/state indicator, and the save / save-and-enable actions. -->
+    <Grid Grid.Row="0" Padding="20,16,20,12" ColumnSpacing="12" VerticalAlignment="Center">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="*" />
+        <ColumnDefinition Width="Auto" />
+        <ColumnDefinition Width="Auto" />
+      </Grid.ColumnDefinitions>
+
+      <TextBlock x:Uid="EditorTitle" Grid.Column="0" Text="自动化编辑器"
+                 FontSize="20" FontWeight="SemiBold" VerticalAlignment="Center"
+                 automation:AutomationProperties.Name="自动化编辑器标题" />
+
+      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <TextBlock x:Name="DirtyIndicator" Text="●" Foreground="#E5A800" Visibility="Collapsed"
+                   automation:AutomationProperties.Name="未保存更改" />
+        <TextBlock x:Name="StateText" Foreground="#A8A8A8" VerticalAlignment="Center"
+                   automation:AutomationProperties.Name="保存状态" />
+      </StackPanel>
+
+      <Button x:Uid="SaveDraftButton" Grid.Column="2" Content="保存草稿" MinWidth="120"
+              Click="OnSaveDraftClick" automation:AutomationProperties.Name="保存草稿" />
+      <Button x:Uid="SaveEnableButton" Grid.Column="3" Content="保存并启用" MinWidth="130"
+              Background="{StaticResource AccentGreenBrush}" Click="OnSaveAndEnableClick"
+              automation:AutomationProperties.Name="保存并启用" />
+    </Grid>
+
+    <!-- Body: 224px step rail + scrollable step content (doc 02 §4). -->
+    <Grid Grid.Row="1" ColumnSpacing="0">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="224" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <!-- Step navigation rail -->
+      <StackPanel x:Name="NavRail" Grid.Column="0" Background="{StaticResource PanelBrush}"
+                  Padding="12,16" Spacing="6">
+        <Button x:Name="Nav0" Tag="0" Content="1  基本信息" HorizontalAlignment="Stretch"
+                Click="OnNavStep" automation:AutomationProperties.Name="第 1 步 基本信息" />
+        <Button x:Name="Nav1" Tag="1" Content="2  触发器" HorizontalAlignment="Stretch"
+                Click="OnNavStep" automation:AutomationProperties.Name="第 2 步 触发器" />
+        <Button x:Name="Nav2" Tag="2" Content="3  工作流" HorizontalAlignment="Stretch"
+                Click="OnNavStep" automation:AutomationProperties.Name="第 3 步 工作流" />
+        <Button x:Name="Nav3" Tag="3" Content="4  权限与预算" HorizontalAlignment="Stretch"
+                Click="OnNavStep" automation:AutomationProperties.Name="第 4 步 权限与预算" />
+        <Button x:Name="Nav4" Tag="4" Content="5  测试与启用" HorizontalAlignment="Stretch"
+                Click="OnNavStep" automation:AutomationProperties.Name="第 5 步 测试与启用" />
+      </StackPanel>
+
+      <ScrollViewer Grid.Column="1" Padding="28,20" VerticalScrollBarVisibility="Auto">
+        <StackPanel Spacing="14" MinWidth="420" MaxWidth="880">
+
+          <!-- Loading / empty / error states -->
+          <ProgressRing x:Name="LoadingRing" IsActive="False" Width="36" Height="36"
+                        HorizontalAlignment="Left" />
+          <InfoBar x:Name="ErrorBar" IsOpen="False" IsClosable="True" Severity="Error"
+                   automation:AutomationProperties.Name="编辑器错误" />
+          <InfoBar x:Name="ConflictBar" IsOpen="False" IsClosable="True" Severity="Warning"
+                   Title="并发冲突" Message="服务器上的副本已被其他人修改。请重新加载后再继续，或放弃本地更改。"
+                   automation:AutomationProperties.Name="并发冲突提示" />
+
+          <!-- Step 1: Basic info -->
+          <StackPanel x:Name="StepBasic" Spacing="12" Visibility="Collapsed">
+            <TextBox x:Uid="NameBox" Header="名称" PlaceholderText="例如：每小时检查项目状态"
+                     Text="{Binding Session.Name, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     automation:AutomationProperties.Name="自动化名称" />
+            <TextBox x:Uid="DescBox" Header="描述" PlaceholderText="可选"
+                     Text="{Binding Session.Description, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     AutomationProperties.Name="自动化描述" />
+            <TextBox x:Name="SpaceIdBox" Header="空间 ID" PlaceholderText="space-1"
+                     Text="{Binding SpaceIdText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     AutomationProperties.Name="空间 ID" />
+            <TextBox x:Uid="ExpertBox" Header="专家 ID" PlaceholderText="expert-9"
+                     Text="{Binding Session.ExpertId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     AutomationProperties.Name="专家 ID" />
+            <TextBox x:Uid="ProjectBox" Header="项目 ID（可选）"
+                     Text="{Binding Session.ProjectId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     AutomationProperties.Name="项目 ID" />
+          </StackPanel>
+
+          <!-- Step 2: Trigger -->
+          <StackPanel x:Name="StepTrigger" Spacing="12" Visibility="Collapsed">
+            <ComboBox x:Name="TriggerTypeBox" Header="触发类型" HorizontalAlignment="Stretch"
+                      SelectionChanged="OnTriggerTypeChanged"
+                      AutomationProperties.Name="触发类型" />
+            <ToggleSwitch x:Name="TriggerEnabledSwitch" Header="启用触发器"
+                          IsOn="{Binding Session.TriggerSession.Enabled, Mode=TwoWay}"
+                          AutomationProperties.Name="启用触发器" />
+            <NumberBox x:Name="IntervalBox" Header="间隔（秒）" Minimum="60" Maximum="2592000"
+                       Value="{Binding Session.TriggerSession.IntervalSeconds, Mode=TwoWay, Converter={StaticResource LongToDouble}}"
+                       SpinButtonPlacementMode="Inline" AutomationProperties.Name="间隔秒数" />
+            <TextBox x:Name="LocalTimeBox" Header="本地时间（HH:mm，用于日历触发）"
+                     Text="{Binding Session.TriggerSession.LocalTime, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     AutomationProperties.Name="本地时间" />
+            <Button x:Uid="PreviewButton" Content="预览未来 10 次运行" Click="OnPreviewClick"
+                    AutomationProperties.Name="预览未来运行" />
+            <ListView x:Name="PreviewList" ItemsSource="{Binding Session.TriggerPreview}"
+                      Header="未来运行预览" MinHeight="40" AutomationProperties.Name="触发器预览列表">
+              <ListView.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Utc, Converter={StaticResource DateTimeOffsetToString}}" />
+                    <TextBlock Text="{Binding IsMissingDaySkipped, Converter={StaticResource BoolToSkipped}}"
+                               Foreground="#E5A800" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListView.ItemTemplate>
+            </ListView>
+            <InfoBar x:Name="TriggerErrorBar" IsOpen="False" IsClosable="False" Severity="Error"
+                     AutomationProperties.Name="触发器校验" />
+          </StackPanel>
+
+          <!-- Step 3: Workflow -->
+          <StackPanel x:Name="StepWorkflow" Spacing="12" Visibility="Collapsed">
+            <TextBlock Text="工作流（DAG）" FontWeight="SemiBold" />
+            <ListView x:Name="NodeList" ItemsSource="{Binding Session.WorkflowSession.Nodes}"
+                      MinHeight="40" AutomationProperties.Name="工作流节点列表">
+              <ListView.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Kind}" Foreground="#A8A8A8" />
+                    <TextBlock Text="{Binding Disabled, Converter={StaticResource BoolToDisabled}}"
+                               Foreground="#888" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListView.ItemTemplate>
+            </ListView>
+            <TextBlock x:Name="WorkflowErrorText" Foreground="#FF6B6B"
+                       AutomationProperties.Name="工作流校验" />
+          </StackPanel>
+
+          <!-- Step 4: Permissions & budget -->
+          <StackPanel x:Name="StepPermissions" Spacing="12" Visibility="Collapsed">
+            <TextBlock Text="权限请求（只读，由自动化系统固定授予）" FontWeight="SemiBold" />
+            <TextBox Header="权限范围" IsReadOnly="True"
+                     Text="{Binding Session.Permission.Scope, Mode=OneWay}"
+                     AutomationProperties.Name="权限范围" />
+            <TextBlock Text="运行预算（只读）" FontWeight="SemiBold" />
+            <TextBox Header="最大模型轮次" IsReadOnly="True"
+                     Text="{Binding Session.Budget.MaxModelTurns, Mode=OneWay}"
+                     AutomationProperties.Name="最大模型轮次" />
+            <TextBox Header="最大总令牌数" IsReadOnly="True"
+                     Text="{Binding Session.Budget.MaxTotalTokens, Mode=OneWay}"
+                     AutomationProperties.Name="最大总令牌数" />
+            <TextBox Header="最大墙钟秒数" IsReadOnly="True"
+                     Text="{Binding Session.Budget.MaxWallClockSeconds, Mode=OneWay}"
+                     AutomationProperties.Name="最大墙钟秒数" />
+            <ComboBox x:Name="OverlapBox" Header="重叠策略" HorizontalAlignment="Stretch"
+                      SelectionChanged="OnOverlapChanged" AutomationProperties.Name="重叠策略" />
+            <ComboBox x:Name="MissedBox" Header="错过运行策略" HorizontalAlignment="Stretch"
+                      SelectionChanged="OnMissedChanged" AutomationProperties.Name="错过运行策略" />
+          </StackPanel>
+
+          <!-- Step 5: Test & enable -->
+          <StackPanel x:Name="StepTest" Spacing="12" Visibility="Collapsed">
+            <Button x:Uid="PreflightButton" Content="运行启用前检查" Click="OnPreflightClick"
+                    AutomationProperties.Name="运行启用前检查" />
+            <ListView x:Name="PreflightList" ItemsSource="{Binding Session.PreflightChecks}"
+                      Header="启用前检查" MinHeight="40" AutomationProperties.Name="启用前检查列表">
+              <ListView.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Status}" FontWeight="SemiBold" />
+                    <TextBlock Text="{Binding Category}" Foreground="#A8A8A8" />
+                    <TextBlock Text="{Binding MessageKey}" Foreground="#A8A8A8" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListView.ItemTemplate>
+            </ListView>
+            <CheckBox x:Name="WarningsAckBox" Content="我已确认上述警告（若有）"
+                      IsChecked="{Binding Session.WarningsAcknowledged, Mode=TwoWay}"
+                      AutomationProperties.Name="确认警告" />
+            <InfoBar x:Name="BlockBar" IsOpen="False" IsClosable="False" Severity="Warning"
+                     Title="无法启用" Message="存在阻止启用的错误。请回到对应步骤修复后再试。"
+                     AutomationProperties.Name="阻止启用提示" />
+          </StackPanel>
+
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+  </Grid>
+</Page>

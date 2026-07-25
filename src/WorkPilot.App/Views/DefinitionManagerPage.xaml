@@ -1,0 +1,108 @@
+<Page
+    x:Class="WorkPilot.Views.DefinitionManagerPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WorkPilot.Views"
+    xmlns:def="using:WorkPilot.App.Core.Automation"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Page.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibility"/>
+    </Page.Resources>
+
+    <Grid Margin="16" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12">
+            <TextBlock Text="自动化定义管理" Style="{StaticResource TitleTextBlockStyle}"/>
+            <ProgressRing IsActive="{x:Bind Vm.IsBusy, Mode=OneWay}" Width="20" Height="20"/>
+        </StackPanel>
+
+        <!-- Error banner -->
+        <InfoBar Grid.Row="1" Severity="Error"
+                 IsOpen="{x:Bind Vm.ErrorMessage, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"
+                 Message="{x:Bind Vm.ErrorMessage, Mode=OneWay}"/>
+
+        <!-- ID selector -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="自动化 ID" VerticalAlignment="Center"/>
+            <TextBox x:Name="IdTextBox" Width="280" PlaceholderText="automation-…"/>
+        </StackPanel>
+
+        <!-- Action buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="8">
+            <Button Content="导出" Command="{x:Bind Vm.ExportCommand}" CommandParameter="{x:Bind IdTextBox.Text}"/>
+            <Button Content="Dry-run 预演" Command="{x:Bind Vm.DryRunCommand}" CommandParameter="{x:Bind IdTextBox.Text}"/>
+            <Button x:Name="PreflightButton" Content="启用前预检" Click="PreflightButton_Click"/>
+        </StackPanel>
+
+        <!-- Import -->
+        <StackPanel Grid.Row="4" Spacing="8">
+            <TextBlock Text="导入（粘贴 portable JSON）" Style="{StaticResource SubtitleTextBlockStyle}"/>
+            <TextBox x:Name="ImportTextBox" AcceptsReturn="True" Height="80" PlaceholderText="{ }{ ... }"/>
+            <Button Content="导入为新草稿" Command="{x:Bind Vm.ImportCommand}" CommandParameter="{x:Bind ImportTextBox.Text}"/>
+        </StackPanel>
+
+        <!-- Results -->
+        <Grid Grid.Row="5" ColumnSpacing="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Export / Import / Dry-run results -->
+            <StackPanel Grid.Column="0" Spacing="6">
+                <TextBlock Text="导出" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="{x:Bind Vm.LastExport.FileName, Mode=OneWay}" Visibility="{x:Bind Vm.LastExport, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"/>
+                <TextBlock Text="{x:Bind Vm.LastExport.CanonicalHash, Mode=OneWay}" Visibility="{x:Bind Vm.LastExport, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"/>
+
+                <TextBlock Text="导入" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="{x:Bind Vm.LastImport.NewAutomationId, Mode=OneWay}" Visibility="{x:Bind Vm.LastImport, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"/>
+                <InfoBar Severity="Warning" Title="需复核"
+                          IsOpen="{x:Bind Vm.LastImport.NeedsReview, Mode=OneWay}"
+                          Visibility="{x:Bind Vm.LastImport, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"
+                          Message="导入含未解析项，启用前请人工复核。"/>
+
+                <TextBlock Text="Dry-run" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="{x:Bind Vm.LastDryRun.FinalStatus, Mode=OneWay}" Visibility="{x:Bind Vm.LastDryRun, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"/>
+                <TextBlock Text="{x:Bind Vm.LastDryRun.PlannedSideEffectCount, Mode=OneWay}" Visibility="{x:Bind Vm.LastDryRun, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"/>
+            </StackPanel>
+
+            <!-- Preflight results -->
+            <StackPanel Grid.Column="1" Spacing="6">
+                <TextBlock Text="启用前预检" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <InfoBar Severity="Error" Title="不可启用"
+                          IsOpen="{x:Bind Vm.LastPreflight.CanEnable, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"
+                          Visibility="{x:Bind Vm.LastPreflight, Mode=OneWay, Converter={StaticResource BoolToVisibility}}"
+                          Message="存在阻断性错误，请先修复。"/>
+                <TextBlock Text="错误" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <ItemsControl ItemsSource="{x:Bind Vm.LastPreflight.Errors, Mode=OneWay}"
+                              Visibility="{x:Bind Vm.LastPreflight, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Code}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <TextBlock Text="警告" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <ItemsControl ItemsSource="{x:Bind Vm.LastPreflight.Warnings, Mode=OneWay}"
+                              Visibility="{x:Bind Vm.LastPreflight, Mode=OneWay, Converter={StaticResource BoolToVisibility}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Code}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>

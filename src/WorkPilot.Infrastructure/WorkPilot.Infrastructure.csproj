@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>WorkPilot.Infrastructure</RootNamespace>
+    <AssemblyName>WorkPilot.Infrastructure</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\WorkPilot.Contracts\WorkPilot.Contracts.csproj" />
+    <ProjectReference Include="..\WorkPilot.Domain\WorkPilot.Domain.csproj" />
+    <ProjectReference Include="..\WorkPilot.Application\WorkPilot.Application.csproj" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.10" />
+  </ItemGroup>
+</Project>

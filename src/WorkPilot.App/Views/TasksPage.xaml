@@ -1,0 +1,46 @@
+<Page
+    x:Class="WorkPilot.Views.TasksPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid Background="{StaticResource AppBackgroundBrush}" Padding="28,22" RowSpacing="14">
+    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+    <Grid>
+      <StackPanel><TextBlock Text="任务" FontSize="24" FontWeight="SemiBold"/><TextBlock x:Name="SpaceName" Foreground="#A8A8A8"/></StackPanel>
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <ToggleButton x:Name="ViewToggle" Content="列表视图" Click="OnToggleView"/>
+        <Button x:Name="UndoButton" Content="撤销移动" Click="OnUndo" IsEnabled="False"/>
+        <Button Content="＋ 新建任务" Background="{StaticResource AccentGreenBrush}" Click="OnNew"/>
+      </StackPanel>
+    </Grid>
+    <Grid Grid.Row="1" ColumnSpacing="10">
+      <Grid.ColumnDefinitions><ColumnDefinition Width="280"/><ColumnDefinition Width="220"/><ColumnDefinition Width="220"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+      <TextBox x:Name="SearchBox" PlaceholderText="搜索任务标题" TextChanged="OnSearchChanged"/>
+      <ComboBox x:Name="ProjectFilter" Grid.Column="1" PlaceholderText="全部项目" SelectionChanged="OnFilterChanged"/>
+      <ComboBox x:Name="PriorityFilter" Grid.Column="2" PlaceholderText="全部优先级" SelectionChanged="OnFilterChanged">
+        <ComboBoxItem Content="全部优先级" Tag=""/><ComboBoxItem Content="低" Tag="low"/><ComboBoxItem Content="普通" Tag="normal"/>
+        <ComboBoxItem Content="高" Tag="high"/><ComboBoxItem Content="紧急" Tag="urgent"/>
+      </ComboBox>
+      <InfoBar x:Name="ErrorBar" Grid.Column="3" IsOpen="False" IsClosable="True" Severity="Error"/>
+    </Grid>
+    <ScrollViewer x:Name="BoardScroll" Grid.Row="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <Border Background="{StaticResource PanelBrush}" CornerRadius="12" Padding="12" Width="260"><StackPanel Spacing="8"><TextBlock Text="待规划" FontWeight="SemiBold"/><ListView x:Name="BacklogList" Tag="backlog" CanDragItems="True" AllowDrop="True" DragItemsStarting="OnDragStarting" DragOver="OnDragOver" Drop="OnDrop" ItemClick="OnTaskClick" IsItemClickEnabled="True" ItemTemplate="{StaticResource TaskTemplate}"/></StackPanel></Border>
+        <Border Background="{StaticResource PanelBrush}" CornerRadius="12" Padding="12" Width="260"><StackPanel Spacing="8"><TextBlock Text="待处理" FontWeight="SemiBold"/><ListView x:Name="TodoList" Tag="todo" CanDragItems="True" AllowDrop="True" DragItemsStarting="OnDragStarting" DragOver="OnDragOver" Drop="OnDrop" ItemClick="OnTaskClick" IsItemClickEnabled="True" ItemTemplate="{StaticResource TaskTemplate}"/></StackPanel></Border>
+        <Border Background="{StaticResource PanelBrush}" CornerRadius="12" Padding="12" Width="260"><StackPanel Spacing="8"><TextBlock Text="进行中" FontWeight="SemiBold"/><ListView x:Name="ProgressList" Tag="in_progress" CanDragItems="True" AllowDrop="True" DragItemsStarting="OnDragStarting" DragOver="OnDragOver" Drop="OnDrop" ItemClick="OnTaskClick" IsItemClickEnabled="True" ItemTemplate="{StaticResource TaskTemplate}"/></StackPanel></Border>
+        <Border Background="{StaticResource PanelBrush}" CornerRadius="12" Padding="12" Width="260"><StackPanel Spacing="8"><TextBlock Text="已阻塞" FontWeight="SemiBold"/><ListView x:Name="BlockedList" Tag="blocked" CanDragItems="True" AllowDrop="True" DragItemsStarting="OnDragStarting" DragOver="OnDragOver" Drop="OnDrop" ItemClick="OnTaskClick" IsItemClickEnabled="True" ItemTemplate="{StaticResource TaskTemplate}"/></StackPanel></Border>
+        <Border Background="{StaticResource PanelBrush}" CornerRadius="12" Padding="12" Width="260"><StackPanel Spacing="8"><TextBlock Text="已完成" FontWeight="SemiBold"/><ListView x:Name="DoneList" Tag="done" CanDragItems="True" AllowDrop="True" DragItemsStarting="OnDragStarting" DragOver="OnDragOver" Drop="OnDrop" ItemClick="OnTaskClick" IsItemClickEnabled="True" ItemTemplate="{StaticResource TaskTemplate}"/></StackPanel></Border>
+      </StackPanel>
+    </ScrollViewer>
+    <ListView x:Name="TaskList" Grid.Row="2" Visibility="Collapsed" ItemClick="OnTaskClick" IsItemClickEnabled="True" ItemTemplate="{StaticResource TaskTemplate}"/>
+  </Grid>
+  <Page.Resources>
+    <DataTemplate x:Key="TaskTemplate">
+      <Border Background="{StaticResource CardBrush}" BorderBrush="#343434" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,0,0,8" MinHeight="92">
+        <StackPanel Spacing="5"><TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextWrapping="Wrap" MaxLines="2"/>
+          <TextBlock Text="{Binding ProjectName}" Foreground="#A8A8A8" FontSize="12"/>
+          <StackPanel Orientation="Horizontal" Spacing="10"><TextBlock Text="{Binding PriorityLabel}" Foreground="#F2B84B"/><TextBlock Text="{Binding DueLabel}" Foreground="#A8A8A8"/></StackPanel>
+        </StackPanel>
+      </Border>
+    </DataTemplate>
+  </Page.Resources>
+</Page>

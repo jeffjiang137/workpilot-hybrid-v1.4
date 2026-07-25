@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- V1.5 automation editor (T06) localization. Keys follow x:Uid.Property. -->
+  <data name="EditorTitle.Text" xml:space="preserve"><value>自动化编辑器</value></data>
+  <data name="SaveDraftButton.Content" xml:space="preserve"><value>保存草稿</value></data>
+  <data name="SaveEnableButton.Content" xml:space="preserve"><value>保存并启用</value></data>
+  <data name="NameBox.Header" xml:space="preserve"><value>名称</value></data>
+  <data name="DescBox.Header" xml:space="preserve"><value>描述</value></data>
+  <data name="ExpertBox.Header" xml:space="preserve"><value>专家 ID</value></data>
+  <data name="ProjectBox.Header" xml:space="preserve"><value>项目 ID（可选）</value></data>
+  <data name="PreviewButton.Content" xml:space="preserve"><value>预览未来 10 次运行</value></data>
+  <data name="PreflightButton.Content" xml:space="preserve"><value>运行启用前检查</value></data>
+
+  <!-- Preflight message keys surfaced by PreflightRunner (honest NotEvaluated, never fake Passed). -->
+  <data name="Preflight.Definition.NameInvalid" xml:space="preserve"><value>名称长度需在 1–{0} 个字符之间。</value></data>
+  <data name="Preflight.Definition.SpaceMissing" xml:space="preserve"><value>未选择空间。</value></data>
+  <data name="Preflight.Definition.ExpertMissing" xml:space="preserve"><value>未选择专家。</value></data>
+  <data name="Preflight.Schema.Pending" xml:space="preserve"><value>架构校验尚未接入（待 T17）。</value></data>
+  <data name="Preflight.Expert.Pending" xml:space="preserve"><value>专家可用性校验尚未接入。</value></data>
+  <data name="Preflight.Source.Pending" xml:space="preserve"><value>数据源健康校验尚未接入。</value></data>
+  <data name="Preflight.Grant.Pending" xml:space="preserve"><value>策略授权评估尚未接入（待 T17）。</value></data>
+  <data name="Preflight.Budget.Pending" xml:space="preserve"><value>预算评估尚未接入。</value></data>
+  <data name="Preflight.Host.Pending" xml:space="preserve"><value>后台主机可用性校验尚未接入。</value></data>
+</root>

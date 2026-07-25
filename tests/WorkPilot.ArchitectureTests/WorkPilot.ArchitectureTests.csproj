@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows10.0.17763.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <RootNamespace>WorkPilot.ArchitectureTests</RootNamespace>
+    <AssemblyName>WorkPilot.ArchitectureTests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+    <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+    <PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\WorkPilot.Contracts\WorkPilot.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\WorkPilot.Domain\WorkPilot.Domain.csproj" />
+    <ProjectReference Include="..\..\src\WorkPilot.Application\WorkPilot.Application.csproj" />
+    <ProjectReference Include="..\..\src\WorkPilot.Infrastructure\WorkPilot.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\WorkPilot.Host\WorkPilot.Host.csproj" />
+    <ProjectReference Include="..\..\src\WorkPilot.Host.Core\WorkPilot.Host.Core.csproj" />
+    <ProjectReference Include="..\..\src\WorkPilot.App.Core\WorkPilot.App.Core.csproj" />
+  </ItemGroup>
+</Project>
