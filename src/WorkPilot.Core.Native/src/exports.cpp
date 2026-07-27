@@ -5,6 +5,7 @@
 #include "workspace.h"
 
 #include <Windows.h>
+#include <objbase.h>
 #include <cstring>
 #include <exception>
 #include <string>

@@ -116,7 +116,7 @@ bool parse_scan_options(const std::string& json, ScanOptions& options, std::stri
         error = "扫描深度或文件数量超过安全上限"; return false;
     }
     const std::string rules = match[4];
-    const std::regex item(R"("((?:\\.|[^"\\])*)")");
+    const std::regex item(R"wp("((?:\\.|[^"\\])*)")wp");
     for (auto it = std::sregex_iterator(rules.begin(), rules.end(), item); it != std::sregex_iterator(); ++it) {
         std::string text = (*it)[1];
         if (text.size() > 500 || options.ignore_rules.size() >= 200) { error = "忽略规则超过安全上限"; return false; }
